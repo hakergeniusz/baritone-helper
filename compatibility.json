@@ -1,0 +1,19 @@
+{
+  "horizon_revision": "2ebf00a0281c592f79191e76fce0e7d522c6f425",
+  "source_sha256": {
+    "crates/horizon-client/src/game.rs": "b12f409bf298f8d7f40f2e79e7e39d5fe7ebe464ecbbeac6914d7814d114de23",
+    "crates/horizon-client/src/game/native_hooks.rs": "2cb9c8f04dd92484ae22788c61d658a76b34ab74bf9deab06b0e44958eecd5bd",
+    "crates/horizon-client/src/game/chat.rs": "b86efedde1ba2eb79b06cb7fb56c5bfb38764fa9b26753b5ef4687877ee88d23"
+  },
+  "horizon_repository": "https://github.com/horizon-rust/horizon",
+  "horizon_mixins_repository": "https://github.com/horizon-rust/horizon-mixins",
+  "horizon_mixins_revision": "5a64af938ec86b00d53d16a408aabc0038fb3e57",
+  "mixin_schema": 6,
+  "requires": [
+    {
+      "mod": "baritone",
+      "reason": "the helper drives Baritone's processes through its own commands",
+      "repository": "https://github.com/luhnox/horizon-baritone"
+    }
+  ]
+}

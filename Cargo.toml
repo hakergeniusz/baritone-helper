@@ -1,0 +1,12 @@
+[package]
+name = "horizon-baritone-helper"
+version = "0.1.0"
+edition = "2024"
+license = "MIT"
+description = "Stacked Baritone actions, stop-at-goal limits and an auto-leave watchdog for Horizon. A native mod."
+publish = false
+
+# The runtime doubles as the mod's library (its tests) and the module the
+# bundle injects into the game; the helper files compile only inside it.
+[lib]
+path = "mixins/baritone_helper/runtime.rs"

@@ -1,0 +1,61 @@
+[mod]
+id = "baritone_helper"
+version = "0.1.0"
+priority = 100
+
+# The commit it was tested on: it reads the game's world, chat and settings
+# and drives Baritone through its own command surface, so a Horizon change
+# there needs a re-check. Baritone (the mod this drives) must be installed
+# alongside: its modules and commands are what this one calls.
+[compatibility]
+horizon_revision = "2ebf00a0281c592f79191e76fce0e7d522c6f425"
+
+# The mod's brain: the queue engine, the limits, the watchdog and the `!q`
+# grammar, in plain standard library — tested on its own, never touches the
+# game. The glue helpers below feed it a Snapshot each tick and carry out
+# the Action it answers with.
+[[module]]
+id = "runtime"
+file = "crates/horizon-client/src/game.rs"
+name = "baritone_helper"
+source = "runtime.rs"
+
+# Once a tick, after Baritone's own: the snapshot goes to the engine, and
+# the answer — submit the next step, end one, leave the world — runs through
+# Baritone's command dispatcher and chat. Window Games only: the integrated
+# server's Game holds the world-open copy of the mods list and never drives
+# the queue.
+[[injection]]
+id = "tick"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_tick"
+helper = "tick.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+]
+
+# A typed line, before it is sent: `!q …` commands, eaten so the server
+# never sees them. A `#` line is left alone (it is Baritone's or the
+# server's, whichever hook ran first) — the player interrupting a step is
+# noticed on the tick, by the process that is in control.
+[[injection]]
+id = "chat"
+kind = "HEAD"
+cancellable = true
+target = "horizon_client::game::chat::Game<'_>::handle_chat_input"
+helper = "chat.rs"
+bindings = [
+  { name = "game", ty = "&mut crate::game::Game<'_>", value = "&mut *self" },
+  { name = "message", ty = "&str", value = "message" },
+]
+
+# The row in Options > Mods: no settings rows — the watchdog's triggers are
+# set with `!q leave …` and persist through the mod's settings storage.
+[[injection]]
+id = "list"
+kind = "HEAD"
+target = "horizon_client::game::native_hooks::Game<'_>::native_mods"
+helper = "list.rs"
+bindings = [
+  { name = "mods", ty = "&mut Vec<crate::game::native_hooks::NativeMod>", value = "&mut *mods" },
+]
