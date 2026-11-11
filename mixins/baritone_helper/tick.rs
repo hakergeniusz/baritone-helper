@@ -15,12 +15,17 @@ fn baritone_helper_tick(game: &mut crate::game::Game<'_>) {
 
     // What Baritone is doing. A temporary process in control means nothing:
     // it is Baritone's own business, not a command the player gave, so its
-    // name is filtered out and the step keeps its own.
+    // name is filtered out and the step keeps its own. Baritone 1.1.52 keeps
+    // the inventory pauser `is_active` unconditionally (it is a standby that
+    // cedes control when the inventory behavior does not ask for it), so
+    // `any_active` is always true and says nothing about work — the real
+    // signal is a non-temporary process in control, plus the pathing state.
     let (baritone_active, proc, status) = crate::game::baritone::with(game, |b, _| {
         let described = b.describe().filter(|d| !d.2);
+        let active = described.is_some();
         let proc = described.as_ref().map(|d| d.0.to_owned());
         let status = described.map(|d| d.3);
-        (b.procs.any_active() || b.core.pathing_busy(), proc, status)
+        (active || b.core.pathing_busy(), proc, status)
     })
     .unwrap_or((false, None, None));
 
